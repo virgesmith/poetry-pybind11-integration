@@ -1,6 +1,4 @@
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
-def py_fib(n):
-    if n < 2:
-        return 1
-    return py_fib(n-2) + py_fib(n-1)
+from _pybind11_extension import *
+

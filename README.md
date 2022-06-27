@@ -1,7 +1,39 @@
-# Example on pybind11 integration with Poetry
+# Example pybind11 integration with Poetry
 
-This project is an example on how to setup a [*pybind11*](https://pybind11.readthedocs.io/en/stable/) build with [*Poetry*](https://python-poetry.org/).
+Creates a python module `poetry-pybind11-integration` containing a C++ extension module.
 
-Lookup at the `build.py` and `pyproject.toml` files for reference. The source code of the C++ extension is under the `pybind11_extension` folder [[link to explanation](https://octavifs.com/post/pybind11-builds-in-poetry/)].
+Build the packages:
 
-Additionally, the repo contains a few samples and benchmarks on how to use pybind11 to release the GIL and achieve true parallellism in Python with multithreading. Useful if you want to execute CPU bound tasks [[link to explanation](https://octavifs.com/post/pybind11-multithreading-parallellism-python/)].
+```sh
+poetry build
+```
+
+generates `setup.py` and produces packages in the `dist` folder: a `tar.gz` format source dist, and a binary wheel.
+
+Test:
+
+```sh
+pytest
+```
+
+Install:
+
+```sh
+poetry install
+```
+
+Use:
+
+```py
+from poetry_pybind11_integration import FibGenerator
+fg = FibGenerator()
+
+print(fg())
+
+```
+
+## Issues
+
+- Multiple version strings (`pyproject.toml` and `__init__.py`). See https://github.com/tiangolo/poetry-version-plugin for solution, requires poetry >=1.2
+
+
