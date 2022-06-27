@@ -28,8 +28,7 @@ Use:
 from poetry_pybind11_integration import FibGenerator
 fg = FibGenerator()
 
-print(fg())
-
+print([next(fg) for _ in range(10)])
 ```
 
 ## Issues
