@@ -1,4 +1,5 @@
 #include "fibonacci.h"
+#include "timer.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -18,6 +19,31 @@ public:
 
 // needs to be a raw pointer as must not be accessed in any way (i.e. deleted) outside the GIL
 py::dict* Registry::registry = new py::dict;
+
+py::cpp_function exectime(py::function f)
+{
+    return [=](py::args args, const py::kwargs& kwargs) {
+        Timer t;
+        py::object result = f(*args, **kwargs);
+        py::print("elapsed (ms): ", t.elapsed_ms());
+        return result;
+    };
+}
+
+
+py::cpp_function average_exectime(size_t n)
+{
+    return [=](py::function f) -> py::cpp_function {
+        return [=](py::args args, const py::kwargs& kwargs) {
+            Timer t;
+            py::object result;
+            for (size_t i = 0; i < n; ++i)
+                result = f(*args, **kwargs);
+            py::print("mean elapsed (ms): ", t.elapsed_ms() / n);
+            return result;
+        };
+    };
+}
 
 
 PYBIND11_MODULE(_pybind11_extension, m)
@@ -50,5 +76,13 @@ PYBIND11_MODULE(_pybind11_extension, m)
               return py::cpp_function([cls](const py::kwargs& kwargs) { return Registry::add(cls, kwargs); });
         })
         .def_property_readonly_static("list", [](py::object&) { return Registry::registry; });
+
+    // decorator
+    m.def("exectime", &exectime, R"""(
+        A simple decorator that times execution, implemented in C++
+    )""")
+    .def("average_exectime", &average_exectime, py::kw_only(), py::arg("n"), R"""(
+        A parameterised decorator that averages execution time for a given number of repeats, implemented in C++
+    )""");
 }
 

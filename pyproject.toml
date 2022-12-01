@@ -1,14 +1,17 @@
 [tool.poetry]
 name = "poetry-pybind11-integration"
-version = "0.1.1"
+version = "0.2.1"
 description = "Example C++ python module packaged for poetry"
 authors = []
 include = [
     {path = "src", format = "sdist"}
 ]
 
+#[tool.poetry-version-plugin]
+#source = "init"
+
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

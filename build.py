@@ -10,7 +10,7 @@ def build(setup_kwargs):
             ],
             depends=["./src/*.h", "./build.py"],
             cxx_std=17,
-            extra_compile_args=["-Werror", "-pedantic"],
+            extra_compile_args=["-O2", "-Wall", "-Werror", "-pedantic"],
             extra_link_args=[]
         )
     ]
