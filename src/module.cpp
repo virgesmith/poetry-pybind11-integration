@@ -4,6 +4,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <memory>
+
 namespace py = pybind11;
 
 class Registry
@@ -46,6 +48,52 @@ py::cpp_function average_exectime(size_t n)
 }
 
 
+// see my answer https://stackoverflow.com/questions/55452762/pybind11-destructor-not-invoked/74656071#74656071
+
+class ManagedResource
+{
+public:
+    ManagedResource(int i) : i(i)
+    {
+        py::print("ManagedResource ctor");
+    }
+
+    ~ManagedResource()
+    {
+        py::print("ManagedResource dtor");
+    }
+
+    int get() const
+    {
+        if (!pi)
+        {
+            throw std::runtime_error("ManagedResource should only be used within a context manager");
+        }
+        return *pi;
+    }
+
+    py::object enter()
+    {
+        py::print("entered context manager");
+        // acquire resources
+        pi = std::make_unique<int>(i);
+        return py::cast(this);
+    }
+
+    void exit(py::handle type, py::handle value, py::handle traceback)
+    {
+        // release resources
+        pi.reset();
+        py::print("exited context manager");
+    }
+
+private:
+    int i;
+    std::unique_ptr<int> pi;
+};
+
+
+
 PYBIND11_MODULE(_pybind11_extension, m)
 {
     m.doc() = R"""(
@@ -84,5 +132,15 @@ PYBIND11_MODULE(_pybind11_extension, m)
     .def("average_exectime", &average_exectime, py::kw_only(), py::arg("n"), R"""(
         A parameterised decorator that averages execution time for a given number of repeats, implemented in C++
     )""");
-}
 
+
+    py::class_<ManagedResource>(m, "ManagedResource")
+    .def(py::init<int>())
+    .def("get", &ManagedResource::get)
+    .def("__enter__", &ManagedResource::enter, R"""(
+        Enter context manager.
+    )""")
+    .def("__exit__", &ManagedResource::exit, R"""(
+        Leave context manager.
+    )""");
+}
