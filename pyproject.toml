@@ -2,7 +2,8 @@
 name = "poetry-pybind11-integration"
 version = "0.2.1"
 description = "Example C++ python module packaged for poetry"
-authors = []
+authors = ["Andrew Smith"]
+homepage = "https://github.com/virgesmith/poetry-pybind11-integration"
 include = [
     {path = "src", format = "sdist"}
 ]
