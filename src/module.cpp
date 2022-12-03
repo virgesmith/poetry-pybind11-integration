@@ -1,4 +1,5 @@
 #include "fibonacci.h"
+#include "managed_resource.h"
 #include "timer.h"
 
 #include <pybind11/pybind11.h>
@@ -48,50 +49,21 @@ py::cpp_function average_exectime(size_t n)
 }
 
 
-// see my answer https://stackoverflow.com/questions/55452762/pybind11-destructor-not-invoked/74656071#74656071
-
-class ManagedResource
+struct Resource
 {
-public:
-    ManagedResource(int i) : i(i)
-    {
-        py::print("ManagedResource ctor");
-    }
+  Resource(int i, int j) : i(i), j(j)
+  {
+    py::print("Resource", i, j);;
+  }
 
-    ~ManagedResource()
-    {
-        py::print("ManagedResource dtor");
-    }
-
-    int get() const
-    {
-        if (!pi)
-        {
-            throw std::runtime_error("ManagedResource should only be used within a context manager");
-        }
-        return *pi;
-    }
-
-    py::object enter()
-    {
-        py::print("entered context manager");
-        // acquire resources
-        pi = std::make_unique<int>(i);
-        return py::cast(this);
-    }
-
-    void exit(py::handle type, py::handle value, py::handle traceback)
-    {
-        // release resources
-        pi.reset();
-        py::print("exited context manager");
-    }
+  int get() const
+  {
+    return i * j;
+  }
 
 private:
-    int i;
-    std::unique_ptr<int> pi;
+  int i, j;
 };
-
 
 
 PYBIND11_MODULE(_pybind11_extension, m)
@@ -133,14 +105,18 @@ PYBIND11_MODULE(_pybind11_extension, m)
         A parameterised decorator that averages execution time for a given number of repeats, implemented in C++
     )""");
 
+    py::class_<Resource>(m, "Resource")
+    .def(py::init<int, int>())
+    .def("get", &Resource::get);
 
-    py::class_<ManagedResource>(m, "ManagedResource")
-    .def(py::init<int>())
-    .def("get", &ManagedResource::get)
-    .def("__enter__", &ManagedResource::enter, R"""(
+
+    py::class_<ManagedResource<Resource, int, int>>(m, "ManagedResource")
+    .def(py::init<int, int>())
+    .def("__call__", &ManagedResource<Resource, int, int>::get)
+    .def("__enter__", &ManagedResource<Resource, int, int>::enter, R"""(
         Enter context manager.
     )""")
-    .def("__exit__", &ManagedResource::exit, R"""(
+    .def("__exit__", &ManagedResource<Resource, int, int>::exit, R"""(
         Leave context manager.
     )""");
 }
