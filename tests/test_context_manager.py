@@ -1,14 +1,24 @@
 import pytest
-from poetry_pybind11_integration import ManagedResource
+from poetry_pybind11_integration import ManagedResource, Thing
 
 def test_context_manager():
-    with ManagedResource(42) as resource:
-        assert resource.get() == 42
+    with ManagedResource(6, 7) as resource:
+        assert isinstance(resource(), Thing)
+        assert resource().get() == 42
+        # can bind to variable....
+        x = resource()
     with pytest.raises(RuntimeError):
-        resource.get()
+        # check resource has been released
+        resource().get()
+    # ... and still access outside CM (invoking UB)
+    print(x.get())
+
+def test_thing_not_constructible_outside_context_manager():
+    with pytest.raises(TypeError):
+        _ = Thing()
 
 
 if __name__ == "__main__":
     test_context_manager()
-    print("end")
+    test_thing_not_constructible_outside_context_manager()
 

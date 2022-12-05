@@ -49,9 +49,9 @@ py::cpp_function average_exectime(size_t n)
 }
 
 
-struct Resource
+struct Thing
 {
-  Resource(int i, int j) : i(i), j(j)
+  Thing(int i, int j) : i(i), j(j)
   {
     py::print("Resource", i, j);;
   }
@@ -105,18 +105,18 @@ PYBIND11_MODULE(_pybind11_extension, m)
         A parameterised decorator that averages execution time for a given number of repeats, implemented in C++
     )""");
 
-    py::class_<Resource>(m, "Resource")
-    .def(py::init<int, int>())
-    .def("get", &Resource::get);
+    // constructor is deliberately not exposed, can only be instantiated via the ManagedResource wrapper
+    py::class_<Thing>(m, "Thing")
+    .def("get", &Thing::get);
 
-
-    py::class_<ManagedResource<Resource, int, int>>(m, "ManagedResource")
+    //
+    py::class_<ManagedResource<Thing, int, int>>(m, "ManagedResource")
     .def(py::init<int, int>())
-    .def("__call__", &ManagedResource<Resource, int, int>::get)
-    .def("__enter__", &ManagedResource<Resource, int, int>::enter, R"""(
+    .def("__call__", &ManagedResource<Thing, int, int>::get)
+    .def("__enter__", &ManagedResource<Thing, int, int>::enter, R"""(
         Enter context manager.
     )""")
-    .def("__exit__", &ManagedResource<Resource, int, int>::exit, R"""(
+    .def("__exit__", &ManagedResource<Thing, int, int>::exit, R"""(
         Leave context manager.
     )""");
 }

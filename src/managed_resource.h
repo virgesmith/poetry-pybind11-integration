@@ -3,27 +3,29 @@
 #include <pybind11/pybind11.h>
 
 #include <memory>
+#include <functional>
 
 namespace py = pybind11;
 
-// see my answer https://stackoverflow.com/questions/55452762/pybind11-destructor-not-invoked/74656071#74656071
 
+// Wrapper enabling an RAII resource to use used (solely) within a context manager.
+// Resource construction is deferred to the enter function, and release brought forward to the exit function
+// see my answer here https://stackoverflow.com/questions/55452762/pybind11-destructor-not-invoked/74656071#74656071
 template<typename T, typename... Args>
-class ManagedResource
+class ManagedResource final
 {
     // Note: T must have python bindings
     typedef T value_type;
 public:
     // use a lambda to store args for later construction
-    ManagedResource(Args... args) : initialiser{[args...]() -> std::unique_ptr<value_type> { return std::make_unique<value_type>(args...); }}
-    {
-        py::print("ManagedResource ctor");
-    }
+    ManagedResource(Args... args) : initialiser{[args...]() -> std::unique_ptr<value_type> { return std::make_unique<value_type>(args...); }} { }
 
-    ~ManagedResource()
-    {
-        py::print("ManagedResource dtor");
-    }
+    ~ManagedResource() { }
+
+    ManagedResource(const ManagedResource&) = delete;
+    ManagedResource& operator=(const ManagedResource&) = delete;
+    ManagedResource(ManagedResource&&) = delete;
+    ManagedResource& operator=(ManagedResource&&) = delete;
 
     value_type& get() const
     {
@@ -36,7 +38,6 @@ public:
 
     py::object enter()
     {
-        py::print("entered context manager");
         // acquire resources
         resource = initialiser();
         return py::cast(this);
@@ -46,7 +47,6 @@ public:
     {
         // release resources
         resource.reset();
-        py::print("exited context manager");
     }
 
 private:
