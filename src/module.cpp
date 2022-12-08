@@ -49,23 +49,6 @@ py::cpp_function average_exectime(size_t n)
 }
 
 
-struct Thing
-{
-  Thing(int i, int j) : i(i), j(j)
-  {
-    py::print("Resource", i, j);;
-  }
-
-  int get() const
-  {
-    return i * j;
-  }
-
-private:
-  int i, j;
-};
-
-
 PYBIND11_MODULE(_pybind11_extension, m)
 {
     m.doc() = R"""(
@@ -105,14 +88,14 @@ PYBIND11_MODULE(_pybind11_extension, m)
         A parameterised decorator that averages execution time for a given number of repeats, implemented in C++
     )""");
 
-    // constructor is deliberately not exposed, can only be instantiated via the ManagedResource wrapper
-    py::class_<Thing>(m, "Thing")
-    .def("get", &Thing::get);
-
     //
-    py::class_<ManagedResource<Thing, int, int>>(m, "ManagedResource")
+    py::class_<ManagedResource<Thing, int, int>>(m, "ManagedThing")
     .def(py::init<int, int>())
-    .def("__call__", &ManagedResource<Thing, int, int>::get)
+    .def("__call__", [](const ManagedResource<Thing, int, int>& wrapper) { return wrapper().do_the_thing(); }, R"""(
+        Here you require at least one lambda to access the wrapped object and perform some operation on/with it.
+        The object itself cannot be exposed to python as this will break RAII (you could bind the result of this call to a python variable
+        and attempt access outside the context manager, invoking undefined behviour - the memory will have been released).
+    )""")
     .def("__enter__", &ManagedResource<Thing, int, int>::enter, R"""(
         Enter context manager.
     )""")

@@ -27,7 +27,7 @@ public:
     ManagedResource(ManagedResource&&) = delete;
     ManagedResource& operator=(ManagedResource&&) = delete;
 
-    value_type& get() const
+    value_type& operator()() const
     {
         if (!resource)
         {
@@ -52,5 +52,28 @@ public:
 private:
     std::function<std::unique_ptr<value_type>()> initialiser;
     std::unique_ptr<value_type> resource;
+};
+
+
+// example of resource to be managed
+struct Thing final
+{
+  Thing(int i, int j) : i(i), j(j)
+  {
+    py::print("constructed a Thing");
+  }
+
+  ~Thing()
+  {
+    py::print("destructing a Thing");
+  }
+
+  int do_the_thing() const
+  {
+    return i * j;
+  }
+
+private:
+  int i, j;
 };
 
