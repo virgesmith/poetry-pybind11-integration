@@ -9,8 +9,8 @@ def build(setup_kwargs):
                 "./src/fibonacci.cpp"
             ],
             depends=["./src/*.h", "./build.py"],
-            cxx_std=17,
-            extra_compile_args=["-O2", "-Wall", "-Werror", "-pedantic"],
+            cxx_std=20,
+            extra_compile_args=["-O3", "-Wall", "-Werror", "-pedantic"],
             extra_link_args=[]
         )
     ]

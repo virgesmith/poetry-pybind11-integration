@@ -94,7 +94,7 @@ PYBIND11_MODULE(_pybind11_extension, m)
     .def("__call__", [](const ManagedResource<Thing, int, int>& wrapper) { return wrapper().do_the_thing(); }, R"""(
         Here you require at least one lambda to access the wrapped object and perform some operation on/with it.
         The object itself cannot be exposed to python as this will break RAII (you could bind the result of this call to a python variable
-        and attempt access outside the context manager, invoking undefined behviour - the memory will have been released).
+        and attempt access outside the context manager, invoking undefined behaviour - the memory will have been released).
     )""")
     .def("__enter__", &ManagedResource<Thing, int, int>::enter, R"""(
         Enter context manager.

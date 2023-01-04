@@ -16,5 +16,4 @@ def test_context_manager():
 
 if __name__ == "__main__":
     test_context_manager()
-    # test_thing_not_constructible_outside_context_manager()
 

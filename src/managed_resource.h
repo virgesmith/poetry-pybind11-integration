@@ -14,7 +14,8 @@ namespace py = pybind11;
 template<typename T, typename... Args>
 class ManagedResource final
 {
-    // Note: T must have python bindings
+    // Note: T must NOT have python bindings, otherwise it's possible for python to have a
+    // dangling reference to this object outside the context manager invoking undefined beahviour
     typedef T value_type;
 public:
     // use a lambda to store args for later construction
