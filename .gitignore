@@ -6,3 +6,4 @@ dist/
 setup.py
 
 *.so
+.vscode

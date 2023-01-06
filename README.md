@@ -19,20 +19,17 @@ pytest
 Use, e.g.:
 
 ```py
-from poetry_pybind11_integration import FibGenerator
+from poetry_pybind11_integration import FibGenerator, Collatz
 fg = FibGenerator()
 
 print([next(fg) for _ in range(10)])
+
+print([next(c) for c in Collatz(19)])
 ```
 
 Contains examples of C++ implementations of:
-- generators (as above)
-- `__init_subclass__`
+- generators (as above), including `send`, `close`, and `throw` methods
+- `__init_subclass__` - using it to register subclasses
 - decorators
 - a context manager
-
-## Issues
-
-- Multiple version strings (`pyproject.toml` and `__init__.py`). See https://github.com/tiangolo/poetry-version-plugin for solution, requires poetry >=1.2
-
 

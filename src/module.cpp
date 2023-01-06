@@ -1,54 +1,14 @@
+#include "registry.h"
+#include "decorators.h"
 #include "fibonacci.h"
 #include "collatz.h"
 #include "managed_resource.h"
-#include "timer.h"
 
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include <memory>
 
 namespace py = pybind11;
+
 using namespace py::literals;
-
-class Registry
-{
-public:
-
-    static void add(const py::object cls, const py::kwargs kwargs)
-    {
-        (*registry)[cls] = kwargs;
-    }
-    static py::dict* registry;
-};
-
-// needs to be a raw pointer as must not be accessed in any way (i.e. deleted) outside the GIL
-py::dict* Registry::registry = new py::dict;
-
-py::cpp_function exectime(py::function f)
-{
-    return [=](py::args args, const py::kwargs& kwargs) {
-        Timer t;
-        py::object result = f(*args, **kwargs);
-        py::print("elapsed (ms): ", t.elapsed_ms());
-        return result;
-    };
-}
-
-
-py::cpp_function average_exectime(size_t n)
-{
-    return [=](py::function f) -> py::cpp_function {
-        return [=](py::args args, const py::kwargs& kwargs) {
-            Timer t;
-            py::object result;
-            for (size_t i = 0; i < n; ++i)
-                result = f(*args, **kwargs);
-            py::print("mean elapsed (ms): ", t.elapsed_ms() / n);
-            return result;
-        };
-    };
-}
 
 
 PYBIND11_MODULE(_pybind11_extension, m)
@@ -92,7 +52,7 @@ PYBIND11_MODULE(_pybind11_extension, m)
         .def(py::init<>())
         // workaround the lack of @classmethod in pybind11 by wrapping in a static that returns a lambda bound to the object
         .def_property_readonly_static("__init_subclass__", [](py::object& cls) {
-              return py::cpp_function([cls](const py::kwargs& kwargs) { return Registry::add(cls, kwargs); });
+              return py::cpp_function([cls](const py::kwargs& kwargs) { return Registry::init_subclass(cls, kwargs); });
         })
         .def_property_readonly_static("list", [](py::object&) { return Registry::registry; });
 

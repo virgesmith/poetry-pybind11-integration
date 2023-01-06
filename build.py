@@ -6,7 +6,9 @@ def build(setup_kwargs):
             "_pybind11_extension",
             sources=[
                 "./src/module.cpp",
-                "./src/fibonacci.cpp"
+                "./src/fibonacci.cpp",
+                "./src/registry.cpp",
+                "./src/decorators.cpp",
             ],
             depends=["./src/*.h", "./build.py"],
             cxx_std=20,
