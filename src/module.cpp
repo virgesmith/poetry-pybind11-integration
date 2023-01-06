@@ -1,4 +1,5 @@
 #include "fibonacci.h"
+#include "collatz.h"
 #include "managed_resource.h"
 #include "timer.h"
 
@@ -8,6 +9,7 @@
 #include <memory>
 
 namespace py = pybind11;
+using namespace py::literals;
 
 class Registry
 {
@@ -67,7 +69,21 @@ PYBIND11_MODULE(_pybind11_extension, m)
         C++ implementation of a Fibonacci sequence generator.
     )""")
         .def(py::init<>())
-        .def("__next__", [](FibGenerator& fg) -> uint64_t { return fg; })
+        .def("__iter__", &FibGenerator::iter, "__iter__ dunder")
+        .def("__next__", &FibGenerator::next, "__next__ dunder")
+        ;
+
+    py::class_<Collatz>(m, "Collatz", R"""(
+        C++ implementation of a Collatz sequence generator.
+    )""")
+        .def(py::init<uint64_t>())
+        .def("__iter__", &Collatz::iter, "return iter")
+        .def("__next__", &Collatz::next, "return next item")
+        .def("send", &Collatz::send, "generator send")
+        .def("send", py::overload_cast<>(&Collatz::next), "generator send (equivalent to next()")
+        .def("close", &Collatz::close, "generator close")
+        .def("throw", &Collatz::throw_, "type"_a, "value"_a = py::none(), "traceback"_a = py::none(), "generator throw")
+        .def("throw", py::overload_cast<>(&Collatz::throw_default), "generator throw default")
         ;
 
     py::class_<Registry>(m, "Registry", R"""(
@@ -103,3 +119,5 @@ PYBIND11_MODULE(_pybind11_extension, m)
         Leave context manager.
     )""");
 }
+
+

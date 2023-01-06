@@ -10,7 +10,7 @@ uint64_t fib_recursive(uint64_t n)
 }
 
 
-FibGenerator::operator uint64_t()
+uint64_t FibGenerator::next()
 {
     uint64_t it = a;
     a = b;
@@ -18,3 +18,7 @@ FibGenerator::operator uint64_t()
     return it;
 }
 
+FibGenerator& FibGenerator::iter()
+{
+    return *this;
+}

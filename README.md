@@ -25,7 +25,8 @@ fg = FibGenerator()
 print([next(fg) for _ in range(10)])
 ```
 
-Also examples of C++ implementations of:
+Contains examples of C++ implementations of:
+- generators (as above)
 - `__init_subclass__`
 - decorators
 - a context manager

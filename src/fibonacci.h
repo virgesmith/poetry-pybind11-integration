@@ -9,7 +9,9 @@ class FibGenerator
 public:
     FibGenerator() : a(0), b(1) {}
 
-    operator uint64_t();
+    uint64_t next();
+
+    FibGenerator& iter();
 
 private:
     uint64_t a;
