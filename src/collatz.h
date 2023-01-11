@@ -16,10 +16,14 @@ public:
     uint64_t next()
     {
         if (at_end)
+        {
             throw py::stop_iteration();
+        }
         uint64_t ret = n;
-        if (n == 1)
-            at_end = true; /// throw on next iteration
+        if (n <= 1)
+        {
+            at_end = true; // throw on next iteration
+        }
         n = n % 2 ? 3 * n + 1 : n / 2;
         return ret;
     }
