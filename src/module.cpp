@@ -42,7 +42,7 @@ PYBIND11_MODULE(_pybind11_extension, m)
         .def("send", &Collatz::send, "generator send")
         .def("send", py::overload_cast<>(&Collatz::next), "generator send (equivalent to next()")
         .def("close", &Collatz::close, "generator close")
-        .def("throw", &Collatz::throw_, "type"_a, "value"_a = py::none(), "traceback"_a = py::none(), "generator throw")
+        .def("throw", &Collatz::throw_, "type"_a, "value"_a = py::str(), "traceback"_a = py::none(), "generator throw")
         .def("throw", py::overload_cast<>(&Collatz::throw_default), "generator throw default")
         ;
 

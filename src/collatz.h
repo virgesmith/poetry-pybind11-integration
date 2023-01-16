@@ -44,12 +44,10 @@ public:
         at_end = true;
     }
 
-    void throw_(py::type e, py::object msg, py::object /*traceback*/)
+    void throw_(py::type e, const std::string& msg, py::object /*traceback*/)
     {
-        auto locals = py::dict("exception_type"_a=e, "exception_message"_a=msg);
-        py::exec(R"""(
-            raise exception_type(exception_message)
-        )""", py::globals(), locals);
+        PyErr_SetString(e.ptr(), msg.c_str());
+        throw py::error_already_set();
     }
 
     void throw_default()
