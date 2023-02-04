@@ -9,6 +9,7 @@ def build(setup_kwargs):
                 "./src/fibonacci.cpp",
                 "./src/registry.cpp",
                 "./src/decorators.cpp",
+                "./src/primes.cpp"
             ],
             depends=["./src/*.h", "./build.py"],
             cxx_std=20,

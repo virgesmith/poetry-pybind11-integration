@@ -3,8 +3,10 @@
 #include "fibonacci.h"
 #include "collatz.h"
 #include "managed_resource.h"
+#include "primes.h"
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 
@@ -78,6 +80,27 @@ PYBIND11_MODULE(_pybind11_extension, m)
     .def("__exit__", &ManagedResource<Thing, int, int>::exit, R"""(
         Leave context manager.
     )""");
+
+    py::class_<PrimeGenerator>(m, "PrimeGenerator", R"""(
+        C++ implementation of a prime number generator.
+    )""")
+        .def(py::init<>())
+        .def("__iter__", &PrimeGenerator::iter, "__iter__ dunder")
+        .def("__next__", &PrimeGenerator::next, "__next__ dunder")
+        ;
+
+    py::class_<PrimeRange>(m, "PrimeRange", R"""(
+        C++ implementation of a prime number generator.
+    )""")
+        .def(py::init<size_t, size_t>())
+        .def("__iter__", &PrimeRange::iter, "__iter__ dunder")
+        .def("__next__", &PrimeRange::next, "__next__ dunder")
+        ;
+
+    m.def("is_prime", &is_prime_py)
+    .def("nth_prime", &nth_prime)
+    .def("prime_factors", &prime_factors);
+
 }
 
 
