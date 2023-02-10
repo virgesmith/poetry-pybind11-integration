@@ -98,7 +98,7 @@ PYBIND11_MODULE(_pybind11_extension, m)
         ;
 
     m.def("is_prime", &is_prime_py)
-    .def("nth_prime", &nth_prime)
+    .def("nth_prime", &nth_prime_py)
     .def("prime_factors", &prime_factors);
 
 }

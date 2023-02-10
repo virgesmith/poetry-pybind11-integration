@@ -8,7 +8,7 @@ Build and install the package:
 poetry build && poetry install
 ```
 
-generates `setup.py` and produces packages in the `dist` folder: a `tar.gz` format source dist, and a binary wheel.
+generates `setup.py` and produces packages in the `dist` folder: a `tar.gz` format source dist, and a binary wheel, although neither of which seem to be installable. (Workaround: use `python setup.py bdist_wheel`.)
 
 Test:
 
@@ -20,11 +20,11 @@ Use, e.g.:
 
 ```py
 from poetry_pybind11_integration import FibGenerator, Collatz
-fg = FibGenerator()
 
+fg = FibGenerator()
 print([next(fg) for _ in range(10)])
 
-print([next(c) for c in Collatz(19)])
+print(list(Collatz(19)))
 ```
 
 Contains examples of C++ implementations of:
@@ -32,4 +32,5 @@ Contains examples of C++ implementations of:
 - `__init_subclass__` - using it to register subclasses
 - decorators
 - a context manager
+- some prime number stuff, for performance comparison aginst an equivalent rust implementation. It doesn't fare well :(. More [here](https://github.com/virgesmith/poetry-rust-integration/).
 

@@ -34,7 +34,7 @@ private:
 
 bool is_prime_py(size_t n);
 
-size_t nth_prime(size_t n);
+size_t nth_prime_py(size_t n);
 
 std::vector<size_t> prime_factors(size_t n);
 

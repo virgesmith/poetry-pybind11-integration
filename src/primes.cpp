@@ -6,12 +6,18 @@
 
 namespace py = pybind11;
 
+// #include <stdexcept>
+// namespace py {
+//     using value_error = std::runtime_error;
+//     using stop_iteration = std::runtime_error;
+// }
+
 namespace {
 // size_t isqrt(size_t n) {
 //     return static_cast<size_t>(std::sqrt(n)) + 1;
 // }
 
-bool is_prime(size_t n, const std::vector<size_t>& primes_below) {
+bool is_prime(size_t n, const std::vector<size_t>& primes_below) noexcept {
     switch (n) {
         case 0:
         case 1:
@@ -33,7 +39,7 @@ bool is_prime(size_t n, const std::vector<size_t>& primes_below) {
     }
 }
 
-std::vector<size_t> seed_primes(size_t n)
+std::vector<size_t> seed_primes(size_t n) noexcept
 {
     std::vector<size_t> primes{2, 3};
     size_t c = primes.back();
@@ -47,7 +53,7 @@ std::vector<size_t> seed_primes(size_t n)
     return primes;
 }
 
-std::vector<size_t> extend_seed_primes(const std::vector<size_t>& primes, size_t n) {
+std::vector<size_t> extend_seed_primes(const std::vector<size_t>& primes, size_t n) noexcept {
     std::vector<size_t> ext_primes;
     size_t c = primes.back();
     for(;;) {
@@ -127,10 +133,7 @@ bool is_prime_py(size_t n) {
 }
 
 
-size_t nth_prime(size_t n) {
-    if (n == 0) {
-        throw py::value_error("n must be >0");
-    }
+size_t nth_prime(size_t n) noexcept {
     std::vector<size_t> found;
     found.reserve(n);
     found.push_back(2);
@@ -146,6 +149,14 @@ size_t nth_prime(size_t n) {
         }
     }
     return found[n-1];
+}
+
+
+size_t nth_prime_py(size_t n) {
+    if (n == 0) {
+        throw py::value_error("n must be >0");
+    }
+    return nth_prime(n);
 }
 
 
