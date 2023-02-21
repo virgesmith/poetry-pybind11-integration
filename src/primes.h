@@ -15,6 +15,19 @@ private:
 
 };
 
+class PrimeSieve
+{
+public:
+    PrimeSieve(size_t n);
+
+    PrimeSieve& iter();
+
+    size_t next();
+private:
+    size_t index;
+    std::vector<size_t> primes;
+};
+
 
 class PrimeRange
 {

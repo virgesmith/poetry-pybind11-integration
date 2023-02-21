@@ -13,9 +13,10 @@ namespace py = pybind11;
 // }
 
 namespace {
-// size_t isqrt(size_t n) {
-//     return static_cast<size_t>(std::sqrt(n)) + 1;
-// }
+
+size_t isqrt(size_t n) {
+    return static_cast<size_t>(std::sqrt(n)) + 1;
+}
 
 bool is_prime(size_t n, const std::vector<size_t>& primes_below) noexcept {
     switch (n) {
@@ -39,35 +40,75 @@ bool is_prime(size_t n, const std::vector<size_t>& primes_below) noexcept {
     }
 }
 
-std::vector<size_t> seed_primes(size_t n) noexcept
-{
-    std::vector<size_t> primes{2, 3};
-    size_t c = primes.back();
-    for (;;) {
-        c += 2;
-        if (c * c > n)
-            break;
-        if (is_prime(c, primes))
-            primes.push_back(c);
+
+// O(n) memory required
+std::vector<size_t> sieve0(size_t n) {
+    n = std::max(n, (size_t)4);
+    std::vector<bool> state(n, true);
+    state[0] = state[1] = false;
+    size_t m = isqrt(n);
+    for (size_t i = 2; i < m; ++i) {
+        if (state[i]) {
+            for (size_t j = i * i; j < n; j += i) {
+                state[j] = false;
+            }
+        }
+    }
+    // TODO more functional approach? cf state.iter().enumerate().filter(|(_, &s)| s).map(|(i, _)| i).collect::<Vec<_>>()
+    std::vector<size_t> primes;
+    for (size_t i = 0; i < n; ++i) {
+        if (state[i]) {
+            primes.push_back(i);
+        }
     }
     return primes;
 }
 
-std::vector<size_t> extend_seed_primes(const std::vector<size_t>& primes, size_t n) noexcept {
-    std::vector<size_t> ext_primes;
-    size_t c = primes.back();
-    for(;;) {
-        c += 2;
-        if (c * c >= n) {
-            break;
+
+std::vector<size_t> sieve(size_t n) {
+    n = std::max(n, (size_t)4);
+    const size_t chunk_size = std::min(n, (size_t)100'000'000);
+    auto primes = sieve0(chunk_size);
+
+    for (size_t n0 = chunk_size; n0 < n; n0 += chunk_size) {
+        size_t n1 = std::min(n0 + chunk_size, n);
+        size_t m = isqrt(n1);
+        std::vector<bool> state(n1 - n0, true);
+        for (size_t p: primes) {
+            if (p > m) {
+                break;
+            }
+            size_t s = n0 % p ? p * (n0 / p + 1) : p * (n0 / p);
+            for (size_t i = s; i < n1; i += p) {
+                state[i - n0] = false;
+            }
         }
-        if (is_prime(c, primes) && is_prime(c, ext_primes)){
-            ext_primes.push_back(c);
+        for (size_t i = 0; i < state.size(); ++i) {
+            if (state[i]) {
+                primes.push_back(n0 + i);
+            }
         }
     }
-    return ext_primes;
+    return primes;
 }
 
+}
+
+// TODO? sieve to sqrt(n) then check primality in next
+PrimeSieve::PrimeSieve(size_t n) : index{0}, primes(sieve(n)) {
+}
+
+
+PrimeSieve& PrimeSieve::iter() {
+    return *this;
+}
+
+
+size_t PrimeSieve::next() {
+    if (index == primes.size()) {
+        throw py::stop_iteration();
+    }
+    return primes[index++];
 }
 
 
@@ -92,7 +133,7 @@ size_t PrimeGenerator::next() {
 }
 
 
-PrimeRange::PrimeRange(size_t m, size_t n): index{m % 2 ? m : m + 1}, n(n), m_seed_primes(seed_primes(n)) {
+PrimeRange::PrimeRange(size_t m, size_t n): index{m % 2 ? m : m + 1}, n(n), m_seed_primes(sieve(isqrt(n))) {
 }
 
 PrimeRange& PrimeRange::iter() {
@@ -112,24 +153,7 @@ size_t PrimeRange::next() {
 
 
 bool is_prime_py(size_t n) {
-    size_t m = 1000000;
-    if (n < m) {
-        return is_prime(n, seed_primes(n));
-    }
-    std::vector<size_t> primes = seed_primes(m);
-    for (;;) {
-        for (size_t p: primes) {
-            if (n % p == 0) {
-                return false;
-            }
-        }
-        if (m > n) {
-            break;
-        }
-        m *= 10;
-        primes = extend_seed_primes(primes, m);
-    }
-    return true;
+    return is_prime(n, sieve(std::max(isqrt(n), (size_t)10)));
 }
 
 
@@ -165,7 +189,7 @@ std::vector<size_t> prime_factors(size_t n) {
         throw py::value_error("input must be >=1");
     }
     std::vector<size_t> factors;
-    for (size_t p: seed_primes(n)) {
+    for (size_t p: sieve(isqrt(n))) {
         while (n % p == 0) {
             n /= p;
             factors.push_back(p);

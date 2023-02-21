@@ -81,6 +81,14 @@ PYBIND11_MODULE(_pybind11_extension, m)
         Leave context manager.
     )""");
 
+    py::class_<PrimeSieve>(m, "PrimeSieve", R"""(
+        C++ implementation of a prime number sieve.
+    )""")
+        .def(py::init<size_t>())
+        .def("__iter__", &PrimeSieve::iter, "__iter__ dunder")
+        .def("__next__", &PrimeSieve::next, "__next__ dunder")
+        ;
+
     py::class_<PrimeGenerator>(m, "PrimeGenerator", R"""(
         C++ implementation of a prime number generator.
     )""")
