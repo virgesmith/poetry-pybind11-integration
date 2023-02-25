@@ -158,21 +158,12 @@ bool is_prime_py(size_t n) {
 
 
 size_t nth_prime(size_t n) noexcept {
-    std::vector<size_t> found;
-    found.reserve(n);
-    found.push_back(2);
-    found.push_back(3);
-    while (n > found.size()) {
-        size_t c = found.back();
-        for(;;) {
-            c += 2;
-            if (is_prime(c, found)) {
-                found.push_back(c);
-                break;
-            }
-        }
-    }
-    return found[n-1];
+    if (n < 6)
+        return std::vector<size_t>{2, 3, 5, 7, 11, 13}[n-1];
+    // https://stackoverflow.com/questions/1042717/is-there-a-way-to-find-the-approximate-value-of-the-nth-prime
+    size_t m = n < 7022 ? n * (log(n) + log(log(n))) : n * (log(n) + (log(log(n)) - 0.9385));
+    const auto& p = sieve(m);
+    return p[n-1];
 }
 
 

@@ -36,6 +36,7 @@ def test_nth_prime():
     assert nth_prime(1_000) == 7919
     assert nth_prime(10_000) == 104729
     assert nth_prime(100_000) == 1299709
+    assert nth_prime(1_000_000) == 15485863
 
 
 def test_is_prime():
