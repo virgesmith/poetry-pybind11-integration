@@ -3,7 +3,10 @@ __pycache__
 *.egg-info/
 build/
 dist/
+stubs/
 setup.py
 
 *.so
 .vscode
+poetry.lock
+.tool-versions

@@ -23,7 +23,7 @@ PYBIND11_MODULE(_pybind11_extension, m)
            :toctree: _generate
     )""";
 
-    m.def("fib_recursive", &fib_recursive, R"""(
+    m.def("fib_recursive", &fib_recursive, "n"_a, R"""(
         Return nth value in fibonnacci sequence, computed recursively.
     )""");
 
@@ -38,7 +38,7 @@ PYBIND11_MODULE(_pybind11_extension, m)
     py::class_<Collatz>(m, "Collatz", R"""(
         C++ implementation of a Collatz sequence generator.
     )""")
-        .def(py::init<uint64_t>())
+        .def(py::init<uint64_t>(), "n"_a)
         .def("__iter__", &Collatz::iter, "return iter")
         .def("__next__", &Collatz::next, "return next item")
         .def("send", &Collatz::send, "generator send")
@@ -68,23 +68,19 @@ PYBIND11_MODULE(_pybind11_extension, m)
 
     //
     py::class_<ManagedResource<Thing, int, int>>(m, "ManagedThing")
-    .def(py::init<int, int>())
+    .def(py::init<int, int>(), "param1"_a, "param2"_a)
     .def("__call__", [](const ManagedResource<Thing, int, int>& wrapper) { return wrapper().do_the_thing(); }, R"""(
         Here you require at least one lambda to access the wrapped object and perform some operation on/with it.
         The object itself cannot be exposed to python as this will break RAII (you could bind the result of this call to a python variable
         and attempt access outside the context manager, invoking undefined behaviour - the memory will have been released).
     )""")
-    .def("__enter__", &ManagedResource<Thing, int, int>::enter, R"""(
-        Enter context manager.
-    )""")
-    .def("__exit__", &ManagedResource<Thing, int, int>::exit, R"""(
-        Leave context manager.
-    )""");
+    .def("__enter__", &ManagedResource<Thing, int, int>::enter, "Enter context manager.")
+    .def("__exit__", &ManagedResource<Thing, int, int>::exit, "type"_a, "value"_a = py::str(), "traceback"_a = py::none(), "Exit context manager.");
 
     py::class_<PrimeSieve>(m, "PrimeSieve", R"""(
         C++ implementation of a prime number sieve.
     )""")
-        .def(py::init<size_t>())
+        .def(py::init<size_t>(), "n"_a)
         .def("__iter__", &PrimeSieve::iter, "__iter__ dunder")
         .def("__next__", &PrimeSieve::next, "__next__ dunder")
         ;
@@ -100,14 +96,14 @@ PYBIND11_MODULE(_pybind11_extension, m)
     py::class_<PrimeRange>(m, "PrimeRange", R"""(
         C++ implementation of a prime number generator.
     )""")
-        .def(py::init<size_t, size_t>())
+        .def(py::init<size_t, size_t>(), "start"_a, "length"_a)
         .def("__iter__", &PrimeRange::iter, "__iter__ dunder")
         .def("__next__", &PrimeRange::next, "__next__ dunder")
         ;
 
-    m.def("is_prime", &is_prime_py)
-    .def("nth_prime", &nth_prime_py)
-    .def("prime_factors", &prime_factors);
+    m.def("is_prime", &is_prime_py, "n"_a)
+    .def("nth_prime", &nth_prime_py, "n"_a)
+    .def("prime_factors", &prime_factors, "n"_a);
 
 }
 

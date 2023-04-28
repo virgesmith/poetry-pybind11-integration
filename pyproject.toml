@@ -7,16 +7,18 @@ homepage = "https://github.com/virgesmith/poetry-pybind11-integration"
 include = [
     {path = "src", format = "sdist"}
 ]
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0"
+pybind11 = "^2.8.0"
+pybind11-stubgen = "^0.13.0"
+mypy = "^1.2.0"
+
 
 [tool.poetry-version-plugin]
 source = "init"
 
 [tool.poetry.dependencies]
-python = ">=3.10"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.0"
-pybind11 = "^2.8.0"
+python = ">=3.9"
 
 [tool.poetry.build]
 script = "build.py"

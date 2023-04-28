@@ -32,5 +32,14 @@ Contains examples of C++ implementations of:
 - `__init_subclass__` - using it to register subclasses
 - decorators
 - a context manager
-- some prime number stuff, for performance comparison aginst an equivalent rust implementation. It doesn't fare well :(. More [here](https://github.com/virgesmith/poetry-rust-integration/).
+- some prime number stuff, for performance comparison aginst an equivalent rust implementation. ~~It doesn't fare well :(~~. More [here](https://github.com/virgesmith/poetry-rust-integration/).
 
+## Type annotations
+
+Type stubs are generated based on the signatures and docstrings in [module.cpp](src/module.cpp), using the `pybind11-stubgen` package directly on the C++ shared object, like so:
+
+```
+pybind11-stubgen _pybind_extension
+```
+
+NB significant manual corrections to the generated `__init__.pyi` are required.
