@@ -108,7 +108,9 @@ PYBIND11_MODULE(_pybind11_extension, m)
 
     py::class_<Animal, PyAnimal>(m, "Animal")
         .def(py::init<>())
-        .def("go", &Animal::go);
+        .def("go", &Animal::go)
+        .def("stop", &Animal::stop)
+        .def("pop", &Animal::pop);
 
     py::class_<Dog, Animal>(m, "Dog")
         .def(py::init<>());

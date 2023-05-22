@@ -19,10 +19,10 @@ class PyAnimal : public Animal {
 public:
     /* Inherit the constructors */
     using Animal::Animal;
-    // and assierator=;
+    // and assignment?
+    using Animal::operator=;
 
-    /* Trampolines (need one gnment?
-    using Animal::opfor each virtual function) */
+    /* Trampolines (need one for each virtual function) */
     std::string go(int n_times) const override {
         PYBIND11_OVERRIDE_PURE(
             std::string, /* Return type */
@@ -57,5 +57,7 @@ public:
 // access the (possibly python) object from C++ via a ref to its base
 inline std::string call_animal(const Animal& animal)
 {
-    return animal.go(3) + " " + animal.stop() + " " + animal.pop();
+    py::object obj = py::cast(&animal); // works for C++
+    const std::string& name = obj.attr("__class__").attr("__name__").cast<std::string>();
+    return name + " " + animal.go(3) + " " + animal.stop() + " " + animal.pop();
 }
