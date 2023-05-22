@@ -4,6 +4,7 @@
 #include "collatz.h"
 #include "managed_resource.h"
 #include "primes.h"
+#include "animal.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -105,6 +106,14 @@ PYBIND11_MODULE(_pybind11_extension, m)
     .def("nth_prime", &nth_prime_py, "n"_a)
     .def("prime_factors", &prime_factors, "n"_a);
 
+    py::class_<Animal, PyAnimal>(m, "Animal")
+        .def(py::init<>())
+        .def("go", &Animal::go);
+
+    py::class_<Dog, Animal>(m, "Dog")
+        .def(py::init<>());
+
+    m.def("call_animal", &call_animal);
 }
 
 
