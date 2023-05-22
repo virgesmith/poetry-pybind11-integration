@@ -9,7 +9,9 @@ from __future__ import annotations
 import typing
 
 __all__ = [
+    "Animal",
     "Collatz",
+    "Dog",
     "FibGenerator",
     "ManagedThing",
     "PrimeGenerator",
@@ -17,6 +19,7 @@ __all__ = [
     "PrimeSieve",
     "Registry",
     "average_exectime",
+    "call_animal",
     "exectime",
     "fib_recursive",
     "is_prime",
@@ -25,6 +28,11 @@ __all__ = [
 ]
 
 
+class Animal():
+    def __init__(self) -> None: ...
+    def go(self, arg0: int) -> str: ...
+    def pop(self) -> str: ...
+    def stop(self) -> str: ...
 class Collatz():
     """
     C++ implementation of a Collatz sequence generator.
@@ -62,6 +70,10 @@ class Collatz():
         """
         generator throw
         """
+
+class Dog(Animal):
+    def __init__(self) -> None: ...
+
 class FibGenerator():
     """
     C++ implementation of a Fibonacci sequence generator.
@@ -150,6 +162,9 @@ def average_exectime(*, n: int) -> typing.Callable[..., typing.Callable[..., tup
     """
     A parameterised decorator that averages execution time for a given number of repeats, implemented in C++
     """
+def call_animal(arg0: Animal) -> str:
+    pass
+
 def exectime(arg0: function) -> typing.Callable[..., tuple[float, typing.Any | None]]:
     """
     A simple decorator that times execution, implemented in C++

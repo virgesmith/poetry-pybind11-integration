@@ -2,6 +2,14 @@ import pytest
 from poetry_pybind11_integration import Animal, Dog, call_animal
 
 
+def test_abstract_base() -> None:
+    # ABC *can* be instantiated...
+    a = Animal()
+    # ... but calling pure virtual function will throw
+    with pytest.raises(RuntimeError):
+        a.go(1)
+
+
 def test_cpp_subclass() -> None:
     # Dog only implements the pure virtual go method
     d = Dog()
@@ -21,6 +29,7 @@ def test_py_subclass() -> None:
         def __init__(self) -> None:
             super().__init__()
 
+        # implement the pure virtual method
         def go(self, n: int) -> str:
             return " ".join(["Miaow"] * n)
 
@@ -28,7 +37,7 @@ def test_py_subclass() -> None:
         def stop(self) -> str:
             return "Cat.stop"
 
-        # override the nonvirtual function
+        # override the nonvirtual method
         def pop(self) -> str:
             raise TypeError("not visible via Animal ref")
 
